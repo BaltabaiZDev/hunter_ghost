@@ -153,7 +153,7 @@ def main():
                     if event.type == pygame.QUIT:
                         running = False
                         waiting = False
-                    elif event.type == pygame.K_r:
+                    elif event.key == pygame.K_r:
                         # Reset everything
                         player = Player()
                         bullets.clear()
