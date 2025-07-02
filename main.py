@@ -6,6 +6,7 @@ from ghost import Ghost
 from bullet import Bullet
 from bonus import Bonus
 
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -25,11 +26,12 @@ def main():
     bg_x = 0
     castle_hp = 10
     ground_timer, flying_timer, bonus_timer = 0, 0, 0
-    ground_interval = 50
+    ground_interval = 75
     flying_interval = 70
     bonus_interval = 500
     font = pygame.font.SysFont('Arial', 30)
     win_game, game_over = False, False
+    a = 0
 
     running = True
     while running:
@@ -40,7 +42,6 @@ def main():
       # bg_x -= 5
       # if bg_x <= -1100:
       #    bg_x = 0
-
 
         # --- Event Handling ---
         for event in pygame.event.get():
@@ -65,17 +66,17 @@ def main():
 
             if ground_timer >= ground_interval:
                 ground_timer = 0
-                ground_interval = random.randint(10, 50)
+                ground_interval = random.randint(15-int(a*0.05), 60 - int(a*0.3))
                 ghosts.append(Ghost('ground', level))
 
             if flying_timer >= flying_interval and level >= 2:
-                flying_timer = 0
-                flying_interval = random.randint(180, 360)
+                flying_timer=0
+                flying_interval=random.randint(20-int(a*0.1), 90 - a)
                 ghosts.append(Ghost('flying', level))
 
             if bonus_timer >= bonus_interval:
-                bonus_timer = 0
-                bonus_obj = Bonus()
+                bonus_timer=0
+                bonus_obj=Bonus()
 
             # --- Bullets update ---
             for b in bullets[:]:
@@ -93,12 +94,12 @@ def main():
                     ghosts.remove(g)
                     castle_hp -= 1
                     if castle_hp <= 0:
-                        game_over = True
+                        game_over=True
                     continue
 
                 # Player collision
                 if player.get_rect().colliderect(g.get_rect()):
-                    game_over = True
+                    game_over=True
 
                 # Bullet collision
                 for b in bullets[:]:
@@ -113,70 +114,81 @@ def main():
                 bonus_obj.draw(screen)
                 if player.get_rect().colliderect(bonus_obj.get_rect()):
                     player.ammo += 20
-                    bonus_obj = None
+                    bonus_obj=None
 
             # --- Level Up ---
             if score >= required_score:
                 level += 1
-                score = 0
+                a += 5
+                score=0
                 required_score += 10
-                ground_interval = max(20, ground_interval - 10)
-                flying_interval = max(60, flying_interval - 20)
+                ground_interval=max(20, ground_interval - 10)
+                flying_interval=max(60, flying_interval - 20)
                 if level > 5:
-                    win_game = True
+                    win_game=True
 
             # --- Draw Player & UI ---
-            moving = keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]
+            moving=keys[pygame.K_RIGHT] or keys[pygame.K_LEFT]
             player.draw(screen, moving=moving)
-            screen.blit(font.render(f"HP: {castle_hp}", True, (255, 0, 0)), (40, 30)) 
-            screen.blit(font.render(f"HP: {castle_hp}", True, (255, 0, 0)), (40, 30))
-            screen.blit(font.render(f"Ammo: {player.ammo}", True, (255, 255, 0)), (40, 60))
-            screen.blit(font.render(f"Level: {level}", True, (0, 255, 0)), (40, 90))
-            screen.blit(font.render(f"Score: {score}/{required_score}", True, (0, 255, 255)), (40, 120))
+            screen.blit(font.render(
+                f"HP: {castle_hp}", True, (255, 0, 0)), (40, 30))
+            screen.blit(font.render(
+                f"HP: {castle_hp}", True, (255, 0, 0)), (40, 30))
+            screen.blit(font.render(
+                f"Ammo: {player.ammo}", True, (255, 255, 0)), (40, 60))
+            screen.blit(font.render(
+                f"Level: {level}", True, (0, 255, 0)), (40, 90))
+            screen.blit(font.render(
+                f"Score: {score}/{required_score}", True, (0, 255, 255)), (40, 120))
 
         # --- Victory Screen ---
         if win_game:
             pygame.mixer.music.stop()
             WIN_SOUND.play()
-            win_font = pygame.font.SysFont('Arial', 60)
-            small_font = pygame.font.SysFont('Arial', 30)
+            win_font=pygame.font.SysFont('Arial', 60)
+            small_font=pygame.font.SysFont('Arial', 30)
             screen.fill((0, 0, 0))
-            text = win_font.render("VICTORY! YOU SAVED THE CASTLE!", True, (0, 255, 0))
-            screen.blit(text, (screen.get_width()//2 - text.get_width()//2, 250))
-            info = small_font.render("Press R key to restart...", True, (200, 200, 200))
-            screen.blit(info, (screen.get_width()//2 - info.get_width()//2, 350))
+            text=win_font.render(
+                "VICTORY! YOU SAVED THE CASTLE!", True, (0, 255, 0))
+            screen.blit(text, (screen.get_width() //
+                        2 - text.get_width()//2, 250))
+            info=small_font.render(
+                "Press any key to restart...", True, (200, 200, 200))
+            screen.blit(info, (screen.get_width() //
+                        2 - info.get_width()//2, 350))
             pygame.display.update()
             pygame.time.delay(500)
-            waiting = True
+            waiting=True
             while waiting:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
-                        running = False
-                        waiting = False
-                    elif event.key == pygame.K_r:
+                        running=False
+                        waiting=False
+                    elif event.type == pygame.KEYDOWN:
                         # Reset everything
-                        player = Player()
+                        player=Player()
                         bullets.clear()
                         ghosts.clear()
-                        bonus_obj = None
-                        score = 0
-                        level = 1
-                        required_score = 20
-                        castle_hp = 10
-                        ground_timer = flying_timer = bonus_timer = 0
-                        ground_interval = 50
-                        flying_interval = 120
-                        win_game = False
+                        bonus_obj=None
+                        score=0
+                        level=1
+                        required_score=20
+                        castle_hp=10
+                        ground_timer=flying_timer=bonus_timer=0
+                        ground_interval=50
+                        flying_interval=120
+                        win_game=False
                         pygame.mixer.music.play(-1)
-                        waiting = False
+                        waiting=False
 
         # --- Game Over ---
         if game_over:
-            over_font = pygame.font.SysFont('Arial', 60)
-            screen.blit(over_font.render("GAME OVER", True, (255, 0, 0)), (440, 300))
+            over_font=pygame.font.SysFont('Arial', 60)
+            screen.blit(over_font.render(
+                "GAME OVER", True, (255, 0, 0)), (440, 300))
             pygame.display.update()
             pygame.time.delay(3000)
-            running = False
+            running=False
 
         pygame.display.update()
         clock.tick(30)

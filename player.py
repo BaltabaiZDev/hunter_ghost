@@ -11,7 +11,7 @@ class Player:
         self.gravity = 2
         self.direction = 'right'
         self.anim_count = 0
-        self.ammo = 50
+        self.ammo = 75
 
     def move(self, keys):
         if keys[pygame.K_RIGHT]:
